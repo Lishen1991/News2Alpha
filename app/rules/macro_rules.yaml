@@ -1,0 +1,97 @@
+# macro_rules.yaml
+#
+# Each rule has the following structure:
+#
+#   id:          unique snake_case identifier
+#   description: human-readable label
+#   conditions:
+#     event_type:   (optional) exact match against ExtractedEvent.event_type
+#     channels_any: (optional) list — fires if ANY listed channel is present
+#                   in ExtractedEvent.channels
+#   signals:
+#     bullish: list of asset identifiers to go long
+#     bearish: list of asset identifiers to go short
+#   mechanism: list of plain-English transmission labels (used in trade thesis)
+#   risk_flags: list of default risk flags for this rule
+#   invalidation_conditions: list of default invalidation conditions
+
+rules:
+
+  - id: geo_oil_supply_shock
+    description: Geopolitical conflict disrupting oil supply or shipping routes
+    conditions:
+      event_type: geopolitical_conflict
+      channels_any:
+        - oil_supply
+        - energy_prices
+        - supply_chain
+    signals:
+      bullish:
+        - brent_crude_front
+        - wti_crude_front
+        - XLE
+      bearish:
+        - airlines_basket
+        - XLI
+    mechanism:
+      - supply_shock
+      - risk_premium_expansion
+    risk_flags:
+      - rapid de-escalation in diplomatic talks
+      - move already priced in by market
+      - OPEC spare capacity absorbs disruption
+    invalidation_conditions:
+      - ceasefire or diplomatic resolution announced
+      - crude inventory build exceeds 5M barrels week-on-week
+      - OPEC+ emergency supply increase confirmed
+
+  - id: inflation_safe_haven
+    description: Inflation surprise or safe-haven flow into gold and USD
+    conditions:
+      channels_any:
+        - inflation
+        - safe_haven_flow
+        - risk_sentiment
+    signals:
+      bullish:
+        - gold_spot
+        - usd_proxy
+        - TLT
+      bearish:
+        - growth_equities_basket
+        - XLY
+    mechanism:
+      - inflation_hedge
+      - risk_off_positioning
+    risk_flags:
+      - central bank policy reversal
+      - move already priced in by market
+      - risk-on sentiment returns faster than expected
+    invalidation_conditions:
+      - CPI print comes in below consensus next release
+      - Fed signals pause or pivot within 30 days
+      - USD index breaks below key support level
+
+  - id: shipping_disruption
+    description: Shipping lane or supply chain disruption beyond energy sector
+    conditions:
+      channels_any:
+        - supply_chain
+        - shipping
+    signals:
+      bullish:
+        - dry_bulk_etf
+        - container_shipping_basket
+      bearish:
+        - global_retail_basket
+        - XLB
+    mechanism:
+      - freight_cost_increase
+      - inventory_cycle_disruption
+    risk_flags:
+      - disruption shorter than anticipated
+      - alternative routes absorb volume
+      - move already priced in by market
+    invalidation_conditions:
+      - shipping lanes re-open within 2 weeks
+      - freight rates normalise to 90-day average
