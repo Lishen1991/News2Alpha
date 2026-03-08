@@ -278,6 +278,22 @@ def _create_cluster(article: ArticleRecord, session: Session, now: datetime) -> 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+def _parse_published_at(published_at: str | None) -> datetime:
+    """
+    Parse an article's published_at string into a timezone-aware datetime.
+    Falls back to the current UTC time if the string is absent or unparseable.
+    """
+    if published_at:
+        try:
+            dt = datetime.fromisoformat(published_at)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except ValueError:
+            pass
+    return datetime.now(timezone.utc)
+
+
 def assign_cluster(article_id: int) -> ClusterResult | None:
     """
     Assign an article to a cluster (or mark it as a duplicate).
@@ -299,7 +315,9 @@ def assign_cluster(article_id: int) -> ClusterResult | None:
                 logger.warning("assign_cluster: article_id=%d not found.", article_id)
                 return None
 
-            now = datetime.now(timezone.utc)
+            # Use the article's published_at as the reference time so that
+            # backdated articles produce historically-accurate cluster dates.
+            now = _parse_published_at(article.published_at)
 
             # --- Return early if already assigned ---
             existing_map = session.query(ArticleClusterMap).filter_by(article_id=article_id).first()

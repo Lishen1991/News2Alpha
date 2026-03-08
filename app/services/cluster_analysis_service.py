@@ -211,6 +211,7 @@ def _persist_cluster_analysis(
         article_count=article_count,
         source_count=source_count,
         matched_rule_ids=matched_rule_ids,
+        created_at=cluster.first_seen_at,
     )
     session.add(cluster_event)
     session.flush()
@@ -226,6 +227,7 @@ def _persist_cluster_analysis(
             supporting_factors=idea.supporting_factors,
             risk_flags=idea.risk_flags,
             invalidation_conditions=idea.invalidation_conditions,
+            created_at=cluster.first_seen_at,
         ))
 
     logger.info(
