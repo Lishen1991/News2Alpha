@@ -96,6 +96,7 @@ def migrate_collector_columns() -> None:
         ("category",               "VARCHAR(64)"),
         ("normalized_title_hash",  "VARCHAR(64)"),
         ("ingestion_source",       "VARCHAR(32)"),
+        ("processing_status",      "VARCHAR(32)"),
     ]
     with engine.connect() as conn:
         for col_name, col_type in new_columns:

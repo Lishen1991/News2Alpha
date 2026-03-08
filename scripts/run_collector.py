@@ -160,18 +160,31 @@ def run_collection_cycle(
         print(f"  [DRY RUN] Would insert up to {len(all_normalized)} article(s).")
         print(f"  [DRY RUN] No changes made to the database.")
     else:
-        ingest_result = ingest_articles(all_normalized, analyze=analyze)
+        ingest_result = ingest_articles(all_normalized)
         print(f"  Inserted      : {ingest_result.inserted}")
         print(f"  Skipped (dup) : {ingest_result.skipped}")
         print(f"  Failed        : {ingest_result.failed}")
 
-        if analyze and ingest_result.inserted > 0:
-            print(f"  Auto-clustered: {ingest_result.inserted} article(s) passed to clustering.")
+        if analyze and ingest_result.new_ids:
+            from app.services.pipeline_orchestrator import run_pipeline
+            print(f"\n  Running full pipeline on {len(ingest_result.new_ids)} new article(s)...")
+            pipe = run_pipeline(ingest_result.new_ids)
+            print(f"  Clusters analyzed : {pipe.clusters_analyzed}"
+                  f" (new={pipe.clusters_new}, updated={pipe.clusters_updated},"
+                  f" skipped={pipe.clusters_skipped})")
+            print(f"  Trade ideas       : {pipe.ideas_generated}")
+            print(f"  Market contexts   : {pipe.contexts_computed}")
+            print(f"  Rankings          : {pipe.rankings_computed}")
+            if pipe.articles_failed or pipe.failed_clusters:
+                print(f"  Failures          : {pipe.articles_failed} articles,"
+                      f" {len(pipe.failed_clusters)} clusters")
 
     print(_SEP2)
 
     if not dry_run and not analyze:
         print("\nTo run the full analysis pipeline on collected articles:")
+        print("  py scripts/run_collector.py --analyze")
+        print("  — or manually —")
         print("  py research/cluster_backfill.py")
         print("  py research/analyze_clusters.py")
         print("  py research/build_market_context.py")
@@ -192,7 +205,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--analyze", action="store_true",
-        help="Auto-assign new articles to clusters after storage."
+        help="Run the full pipeline (cluster → analyze → market context → rankings) "
+             "on newly stored articles."
     )
     parser.add_argument(
         "--dry-run", action="store_true",

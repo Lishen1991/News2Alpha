@@ -48,6 +48,10 @@ class ArticleRecord(Base):
     )
     ingestion_source: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
+    # --- Orchestrator field — tracks pipeline progress per article ---
+    # Values: None (not started) | 'clustered' | 'duplicate' | 'failed'
+    processing_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
     # One article → one event (cascade delete keeps DB consistent)
     event: Mapped[EventRecord | None] = relationship(
         "EventRecord", back_populates="article", uselist=False, cascade="all, delete-orphan"
