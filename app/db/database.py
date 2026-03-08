@@ -91,6 +91,7 @@ def init_db() -> None:
     import app.db.models  # noqa: F401
     import app.db.cluster_models  # noqa: F401
     import app.db.cluster_analysis_models  # noqa: F401
+    import app.db.market_context_models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
     logger.info("Database initialised at %s", _DB_PATH)
