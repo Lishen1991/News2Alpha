@@ -40,6 +40,14 @@ class ArticleRecord(Base):
         DateTime(timezone=True), default=_utcnow, nullable=False
     )
 
+    # --- Collector fields (added by RSS collector; nullable for backwards compat) ---
+    collected_at: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    normalized_title_hash: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, index=True
+    )
+    ingestion_source: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
     # One article → one event (cascade delete keeps DB consistent)
     event: Mapped[EventRecord | None] = relationship(
         "EventRecord", back_populates="article", uselist=False, cascade="all, delete-orphan"

@@ -81,6 +81,32 @@ def get_session() -> Generator[Session, None, None]:
 # ---------------------------------------------------------------------------
 # Table initialisation — called once from main.py on startup
 # ---------------------------------------------------------------------------
+def migrate_collector_columns() -> None:
+    """
+    Add collector-specific columns to the articles table if they don't exist.
+
+    Safe to call on every startup — uses ALTER TABLE with per-column
+    try/except so already-existing columns are silently skipped.
+    This is the standard approach for zero-downtime SQLite migrations.
+    """
+    from sqlalchemy import text
+
+    new_columns = [
+        ("collected_at",           "VARCHAR(64)"),
+        ("category",               "VARCHAR(64)"),
+        ("normalized_title_hash",  "VARCHAR(64)"),
+        ("ingestion_source",       "VARCHAR(32)"),
+    ]
+    with engine.connect() as conn:
+        for col_name, col_type in new_columns:
+            try:
+                conn.execute(text(f"ALTER TABLE articles ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+                logger.info("Added column articles.%s", col_name)
+            except Exception:
+                pass  # column already exists — safe to ignore
+
+
 def init_db() -> None:
     """
     Create all tables defined in app/db/models.py if they do not exist.

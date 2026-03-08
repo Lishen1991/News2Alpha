@@ -1,0 +1,64 @@
+# news_sources.yaml
+#
+# Configure RSS/Atom feeds for the News2Alpha collector.
+#
+# Fields per feed:
+#   name      : human-readable label (used as article.source)
+#   url       : full RSS/Atom feed URL
+#   category  : optional tag for grouping (markets, energy, macro, etc.)
+#   enabled   : set false to skip without deleting the entry
+#
+# To add a feed: copy one block, fill in name/url, set enabled: true.
+# To disable a feed temporarily: set enabled: false.
+
+feeds:
+
+  # ── Energy & Commodities ──────────────────────────────────────────
+  - name: Reuters Commodities
+    url: https://feeds.reuters.com/reuters/commoditiesNews
+    category: energy
+    enabled: true
+
+  - name: Reuters Business
+    url: https://feeds.reuters.com/reuters/businessNews
+    category: markets
+    enabled: true
+
+  # ── Macro & Central Banks ─────────────────────────────────────────
+  - name: BBC Business
+    url: https://feeds.bbci.co.uk/news/business/rss.xml
+    category: macro
+    enabled: true
+
+  - name: CNBC Economy
+    url: https://www.cnbc.com/id/20910258/device/rss/rss.html
+    category: macro
+    enabled: true
+
+  # ── Equities & Markets ────────────────────────────────────────────
+  - name: MarketWatch Top Stories
+    url: https://feeds.content.dowjones.io/public/rss/mw_topstories
+    category: markets
+    enabled: true
+
+  - name: Yahoo Finance News
+    url: https://finance.yahoo.com/news/rssindex
+    category: markets
+    enabled: true
+
+  # ── Geopolitics & Supply Chains ───────────────────────────────────
+  - name: Al Jazeera Economy
+    url: https://www.aljazeera.com/xml/rss/all.xml
+    category: geopolitical
+    enabled: true
+
+  # ── Disabled / Placeholders (require auth or frequently unavailable)
+  - name: Financial Times (placeholder)
+    url: https://www.ft.com/rss/home
+    category: markets
+    enabled: false
+
+  - name: Bloomberg Markets (placeholder)
+    url: https://feeds.bloomberg.com/markets/news.rss
+    category: markets
+    enabled: false
